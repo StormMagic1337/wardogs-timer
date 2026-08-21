@@ -5,6 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>До старта WARDOGS</title>
 <meta name="description" content="Обратный отсчёт до старта закрытой беты WARDOGS — 20:00 МСК / 17:00 UTC." />
+<!-- Open Graph (превью в Discord / Steam / соцсетях) -->
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://stormmagic1337.github.io/wardogs-timer/" />
+<meta property="og:title" content="До старта WARDOGS" />
+<meta property="og:description" content="Обратный отсчёт до закрытой беты — 20:00 МСК / 17:00 UTC, 21.08.2026." />
+<meta property="og:image" content="https://stormmagic1337.github.io/wardogs-timer/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="theme-color" content="#F2A900" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="До старта WARDOGS" />
+<meta name="twitter:image" content="https://stormmagic1337.github.io/wardogs-timer/og.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -97,6 +109,13 @@
     font-family:'Share Tech Mono',ui-monospace,monospace;
     text-align:center;
     gap:0;
+    opacity:0;
+    transition:opacity .35s ease;
+  }
+  .clock.ready{opacity:1}
+  .noscript-fallback{
+    text-align:center;color:var(--amber);
+    font-family:'Share Tech Mono',monospace;font-size:16px;padding:18px 0;
   }
   .unit{position:relative;padding:6px 0}
   .num{
@@ -190,6 +209,9 @@
         <div class="unit"><div class="num" id="m">00</div><div class="lbl">минут</div></div>
         <div class="unit"><div class="num" id="s">00</div><div class="lbl">секунд</div></div>
       </div>
+      <noscript>
+        <p class="noscript-fallback">Старт: 21.08.2026 · 20:00 МСК (17:00 UTC)</p>
+      </noscript>
     </div>
 
     <div class="muster">
@@ -259,6 +281,7 @@
   }
 
   tick();
+  document.querySelector('.clock').classList.add('ready'); // показать только после расчёта
   setInterval(tick, 1000);
 </script>
 </body>

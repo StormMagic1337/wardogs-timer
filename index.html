@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>До старта WARDOGS</title>
+<meta name="description" content="Обратный отсчёт до старта закрытой беты WARDOGS — 20:00 МСК / 17:00 UTC." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#14160F;
+    --panel:#1B1E15;
+    --line:#3A3E30;
+    --ink:#E8E4D5;
+    --muted:#8C8D77;
+    --amber:#F2A900;
+    --amber-dim:#7a5c10;
+    --alert:#D24127;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:
+      radial-gradient(1200px 600px at 50% -10%, #20241a 0%, transparent 60%),
+      var(--bg);
+    color:var(--ink);
+    font-family:'Oswald',system-ui,sans-serif;
+    min-height:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:28px 18px 40px;
+    letter-spacing:.02em;
+  }
+
+  /* hazard stripe */
+  .hazard{
+    position:fixed;top:0;left:0;right:0;height:8px;
+    background:repeating-linear-gradient(135deg,var(--amber) 0 22px,#14160F 22px 44px);
+    opacity:.85;
+  }
+
+  .eyebrow{
+    font-size:clamp(11px,2.4vw,13px);
+    letter-spacing:.42em;
+    text-transform:uppercase;
+    color:var(--amber);
+    text-align:center;
+    margin-bottom:10px;
+  }
+  h1{
+    font-weight:700;
+    text-transform:uppercase;
+    font-size:clamp(26px,7vw,52px);
+    line-height:1;
+    text-align:center;
+    letter-spacing:.06em;
+    margin-bottom:26px;
+  }
+
+  /* briefing panel */
+  .panel{
+    position:relative;
+    width:min(720px,100%);
+    background:linear-gradient(180deg,#1E2117,#171A11);
+    border:1px solid var(--line);
+    padding:clamp(26px,5vw,44px) clamp(18px,4vw,40px);
+  }
+  /* corner brackets */
+  .panel::before,.panel::after{
+    content:"";position:absolute;width:22px;height:22px;pointer-events:none;
+  }
+  .panel::before{top:-1px;left:-1px;border-top:2px solid var(--amber);border-left:2px solid var(--amber)}
+  .panel::after{bottom:-1px;right:-1px;border-bottom:2px solid var(--amber);border-right:2px solid var(--amber)}
+  .corner-tr,.corner-bl{position:absolute;width:22px;height:22px;pointer-events:none}
+  .corner-tr{top:-1px;right:-1px;border-top:2px solid var(--amber);border-right:2px solid var(--amber)}
+  .corner-bl{bottom:-1px;left:-1px;border-bottom:2px solid var(--amber);border-left:2px solid var(--amber)}
+
+  /* scanline shimmer over the clock */
+  .clock-wrap{position:relative;overflow:hidden}
+  .clock-wrap::after{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(180deg,transparent 0%,rgba(242,169,0,.06) 50%,transparent 100%);
+    background-size:100% 6px;
+    mix-blend-mode:screen;
+    animation:scan 6s linear infinite;
+  }
+  @keyframes scan{from{background-position:0 -80px}to{background-position:0 80px}}
+
+  .clock{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    align-items:end;
+    font-family:'Share Tech Mono',ui-monospace,monospace;
+    text-align:center;
+    gap:0;
+  }
+  .unit{position:relative;padding:6px 0}
+  .num{
+    font-size:clamp(40px,13vw,88px);
+    line-height:.95;
+    color:var(--amber);
+    text-shadow:0 0 18px rgba(242,169,0,.35);
+    font-variant-numeric:tabular-nums;
+  }
+  .lbl{
+    margin-top:10px;
+    font-family:'Oswald',sans-serif;
+    font-size:clamp(9px,2vw,12px);
+    letter-spacing:.28em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+  /* colon separators */
+  .unit + .unit::before{
+    content:":";
+    position:absolute;left:-.08em;top:clamp(6px,3vw,14px);
+    transform:translateX(-50%);
+    font-size:clamp(30px,9vw,64px);
+    color:var(--amber-dim);
+  }
+
+  .muster{
+    margin-top:30px;
+    border-top:1px solid var(--line);
+    padding-top:18px;
+    display:flex;flex-wrap:wrap;gap:6px 20px;
+    justify-content:space-between;align-items:baseline;
+    font-family:'Share Tech Mono',monospace;
+    font-size:clamp(12px,2.6vw,15px);
+    color:var(--ink);
+  }
+  .muster .k{color:var(--muted);letter-spacing:.15em;text-transform:uppercase;font-family:'Oswald',sans-serif;font-size:11px}
+  .muster .v{color:var(--amber)}
+
+  .now{
+    margin-top:12px;
+    font-family:'Share Tech Mono',monospace;
+    font-size:clamp(11px,2.4vw,13px);
+    color:var(--muted);
+    text-align:center;
+  }
+  .now b{color:var(--ink);font-weight:400}
+
+  /* live / go states */
+  .status-tag{
+    display:inline-block;margin-top:22px;
+    font-size:12px;letter-spacing:.3em;text-transform:uppercase;
+    color:var(--amber);border:1px solid var(--amber-dim);padding:6px 14px;
+  }
+  body.go .num{color:var(--alert);text-shadow:0 0 22px rgba(210,65,39,.5)}
+  body.go .eyebrow{color:var(--alert)}
+  body.go .panel::before,body.go .panel::after,
+  body.go .corner-tr,body.go .corner-bl{border-color:var(--alert)}
+  body.go .hazard{background:repeating-linear-gradient(135deg,var(--alert) 0 22px,#14160F 22px 44px)}
+
+  footer{
+    width:min(720px,100%);
+    margin-top:26px;
+    font-family:'Share Tech Mono',monospace;
+    font-size:12px;color:var(--muted);line-height:1.7;
+  }
+  footer a{color:var(--amber);text-decoration:none;border-bottom:1px solid var(--amber-dim)}
+  footer a:hover,footer a:focus{color:#ffce4d;border-bottom-color:#ffce4d}
+  footer a:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+  footer .note{margin-top:10px;color:#6f7160}
+
+  @media (prefers-reduced-motion:reduce){
+    .clock-wrap::after{animation:none}
+  }
+</style>
+</head>
+<body>
+  <div class="hazard" aria-hidden="true"></div>
+
+  <p class="eyebrow">Операция // Закрытая бета</p>
+  <h1>До старта WARDOGS</h1>
+
+  <section class="panel" aria-label="Обратный отсчёт до старта">
+    <span class="corner-tr" aria-hidden="true"></span>
+    <span class="corner-bl" aria-hidden="true"></span>
+
+    <div class="clock-wrap">
+      <div class="clock" role="timer" aria-live="polite">
+        <div class="unit"><div class="num" id="d">00</div><div class="lbl">дней</div></div>
+        <div class="unit"><div class="num" id="h">00</div><div class="lbl">часов</div></div>
+        <div class="unit"><div class="num" id="m">00</div><div class="lbl">минут</div></div>
+        <div class="unit"><div class="num" id="s">00</div><div class="lbl">секунд</div></div>
+      </div>
+    </div>
+
+    <div class="muster">
+      <span><span class="k">Сбор</span> &nbsp;<span class="v" id="muster">21.08.2026 · 20:00 МСК</span></span>
+      <span><span class="k">UTC</span> &nbsp;<span class="v" id="musterUtc">17:00</span></span>
+    </div>
+    <p class="now">Сейчас по Москве: <b id="mskNow">--:--:--</b></p>
+
+    <div style="text-align:center">
+      <span class="status-tag" id="statusTag">до открытия серверов</span>
+    </div>
+  </section>
+
+  <footer>
+    17:00 UTC = 20:00 по Москве. Россия не переходит на летнее время — смещение постоянно.<br>
+    Discord СНГ: <a href="https://discord.com/invite/kwxrTCJxre" target="_blank" rel="noopener">discord.gg/kwxrTCJxre</a>
+    &nbsp;·&nbsp; Калькулятор: <a href="https://djzet.github.io/wardogs-calc/" target="_blank" rel="noopener">wardogs-calc</a>
+    <p class="note">Время беты — по данным сообщества, может измениться. Сверяйтесь с официальным Discord / @WARDOGS.</p>
+  </footer>
+
+<script>
+  /* ============================================================
+     НАСТРОЙКА: старт беты как момент времени в UTC.
+     20:00 МСК = 17:00 UTC. Формат: Date.UTC(год, месяц-1, день, час, мин, сек)
+     Месяц считается с нуля: август = 7.
+     Чтобы поменять на будущий тест — правьте только эту строку.
+     ============================================================ */
+  const START_UTC = Date.UTC(2026, 7, 21, 17, 0, 0);   // 21.08.2026 17:00 UTC = 20:00 МСК
+  const END_UTC   = Date.UTC(2026, 7, 24, 2, 0, 0);    // конец окна (для статуса)
+
+  const pad = n => String(n).padStart(2, '0');
+  const el = id => document.getElementById(id);
+
+  function mskClock(now){
+    // текущее время по Москве (UTC+3) независимо от часового пояса зрителя
+    const msk = new Date(now.getTime() + 3*3600*1000);
+    return pad(msk.getUTCHours())+':'+pad(msk.getUTCMinutes())+':'+pad(msk.getUTCSeconds());
+  }
+
+  function tick(){
+    const now = new Date();
+    el('mskNow').textContent = mskClock(now);
+
+    let diff = START_UTC - now.getTime();
+
+    if (diff > 0){
+      const dd = Math.floor(diff/86400000);
+      const hh = Math.floor(diff%86400000/3600000);
+      const mm = Math.floor(diff%3600000/60000);
+      const ss = Math.floor(diff%60000/1000);
+      el('d').textContent = pad(dd);
+      el('h').textContent = pad(hh);
+      el('m').textContent = pad(mm);
+      el('s').textContent = pad(ss);
+      document.body.classList.remove('go');
+      el('statusTag').textContent = 'до открытия серверов';
+    } else {
+      el('d').textContent = el('h').textContent = el('m').textContent = el('s').textContent = '00';
+      document.body.classList.add('go');
+      if (now.getTime() < END_UTC){
+        el('statusTag').textContent = '● серверы открыты — вперёд';
+      } else {
+        document.body.classList.remove('go');
+        el('statusTag').textContent = 'окно теста завершено';
+      }
+    }
+  }
+
+  tick();
+  setInterval(tick, 1000);
+</script>
+</body>
+</html>

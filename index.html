@@ -104,7 +104,7 @@
 
   .clock{
     display:grid;
-    grid-template-columns:repeat(4,1fr);
+    grid-template-columns:repeat(5,1fr);
     align-items:end;
     font-family:'Share Tech Mono',ui-monospace,monospace;
     text-align:center;
@@ -119,12 +119,13 @@
   }
   .unit{position:relative;padding:6px 0}
   .num{
-    font-size:clamp(40px,13vw,88px);
+    font-size:clamp(26px,8vw,58px);
     line-height:.95;
     color:var(--amber);
     text-shadow:0 0 18px rgba(242,169,0,.35);
     font-variant-numeric:tabular-nums;
   }
+  .unit.msu .num{color:#ffce4d}
   .lbl{
     margin-top:10px;
     font-family:'Oswald',sans-serif;
@@ -136,9 +137,9 @@
   /* colon separators */
   .unit + .unit::before{
     content:":";
-    position:absolute;left:-.08em;top:clamp(6px,3vw,14px);
+    position:absolute;left:-.08em;top:clamp(4px,2.2vw,10px);
     transform:translateX(-50%);
-    font-size:clamp(30px,9vw,64px);
+    font-size:clamp(20px,5.5vw,42px);
     color:var(--amber-dim);
   }
 
@@ -176,6 +177,41 @@
   body.go .corner-tr,body.go .corner-bl{border-color:var(--alert)}
   body.go .hazard{background:repeating-linear-gradient(135deg,var(--alert) 0 22px,#14160F 22px 44px)}
 
+  /* нижний блок "всего" — часы и секунды */
+  .totals{
+    width:min(720px,100%);
+    margin-top:14px;
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+  }
+  .stat{
+    background:linear-gradient(180deg,#1E2117,#171A11);
+    border:1px solid var(--line);
+    padding:16px 8px;
+    text-align:center;
+    overflow:hidden;
+  }
+  .stat .snum{
+    font-family:'Share Tech Mono',ui-monospace,monospace;
+    font-size:clamp(20px,5vw,34px);
+    color:var(--amber);
+    font-variant-numeric:tabular-nums;
+    line-height:1;
+    text-shadow:0 0 14px rgba(242,169,0,.3);
+    white-space:nowrap;
+  }
+  .stat .slbl{
+    margin-top:9px;
+    font-family:'Oswald',sans-serif;
+    font-size:clamp(9px,2vw,11px);
+    letter-spacing:.2em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+  body.go .stat .snum{color:var(--alert)}
+  @media (max-width:520px){ .totals{grid-template-columns:1fr} }
+
   footer{
     width:min(720px,100%);
     margin-top:26px;
@@ -208,6 +244,7 @@
         <div class="unit"><div class="num" id="h">00</div><div class="lbl">часов</div></div>
         <div class="unit"><div class="num" id="m">00</div><div class="lbl">минут</div></div>
         <div class="unit"><div class="num" id="s">00</div><div class="lbl">секунд</div></div>
+        <div class="unit msu"><div class="num" id="ms">000</div><div class="lbl">мс</div></div>
       </div>
       <noscript>
         <p class="noscript-fallback">Ранний доступ: 10.09.2026 · 20:00 МСК (17:00 UTC)</p>
@@ -223,6 +260,11 @@
     <div style="text-align:center">
       <span class="status-tag" id="statusTag">до раннего доступа</span>
     </div>
+  </section>
+
+  <section class="totals" aria-label="Всего до старта">
+    <div class="stat"><div class="snum" id="tHours">0</div><div class="slbl">часов всего</div></div>
+    <div class="stat"><div class="snum" id="tSecs">0</div><div class="slbl">секунд всего</div></div>
   </section>
 
   <footer>
@@ -242,41 +284,48 @@
   const START_UTC = Date.UTC(2026, 8, 10, 17, 0, 0);   // 10.09.2026 17:00 UTC = 20:00 МСК (ранний доступ)
 
   const pad = n => String(n).padStart(2, '0');
+  const pad3 = n => String(n).padStart(3, '0');
   const el = id => document.getElementById(id);
+
+  // пишем в DOM только при изменении значения:
+  // мс меняются каждый кадр, остальные разряды — раз в секунду
+  const cache = {};
+  const set = (id, val) => { if (cache[id] !== val) { cache[id] = val; el(id).textContent = val; } };
+  const fmt = n => n.toLocaleString('ru-RU'); // разрядные пробелы: 1 764 900
 
   function mskClock(now){
     // текущее время по Москве (UTC+3) независимо от часового пояса зрителя
-    const msk = new Date(now.getTime() + 3*3600*1000);
+    const msk = new Date(now + 3*3600*1000);
     return pad(msk.getUTCHours())+':'+pad(msk.getUTCMinutes())+':'+pad(msk.getUTCSeconds());
   }
 
-  function tick(){
-    const now = new Date();
-    el('mskNow').textContent = mskClock(now);
+  function frame(){
+    const now = Date.now();
+    set('mskNow', mskClock(now));
 
-    let diff = START_UTC - now.getTime();
+    const diff = START_UTC - now;
 
     if (diff > 0){
-      const dd = Math.floor(diff/86400000);
-      const hh = Math.floor(diff%86400000/3600000);
-      const mm = Math.floor(diff%3600000/60000);
-      const ss = Math.floor(diff%60000/1000);
-      el('d').textContent = pad(dd);
-      el('h').textContent = pad(hh);
-      el('m').textContent = pad(mm);
-      el('s').textContent = pad(ss);
+      set('d',  pad(Math.floor(diff/86400000)));
+      set('h',  pad(Math.floor(diff%86400000/3600000)));
+      set('m',  pad(Math.floor(diff%3600000/60000)));
+      set('s',  pad(Math.floor(diff%60000/1000)));
+      set('ms', pad3(Math.floor(diff%1000)));
+      set('tHours', fmt(Math.floor(diff/3600000)));
+      set('tSecs',  fmt(Math.floor(diff/1000)));
       document.body.classList.remove('go');
-      el('statusTag').textContent = 'до открытия серверов';
+      set('statusTag', 'до раннего доступа');
     } else {
-      el('d').textContent = el('h').textContent = el('m').textContent = el('s').textContent = '00';
+      set('d','00'); set('h','00'); set('m','00'); set('s','00'); set('ms','000');
+      set('tHours', '0'); set('tSecs', '0');
       document.body.classList.add('go');
-      el('statusTag').textContent = '● ранний доступ открыт — вперёд';
+      set('statusTag', '● ранний доступ открыт — вперёд');
     }
+    requestAnimationFrame(frame);
   }
 
-  tick();
+  frame();
   document.querySelector('.clock').classList.add('ready'); // показать только после расчёта
-  setInterval(tick, 1000);
 </script>
 </body>
 </html>

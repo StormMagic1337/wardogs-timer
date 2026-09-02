@@ -3,19 +3,19 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>До старта WARDOGS</title>
-<meta name="description" content="Обратный отсчёт до раннего доступа WARDOGS — 20:00 МСК / 17:00 UTC, 10.09.2026." />
+<title>WARDOGS — таймеры беты и релиза</title>
+<meta name="description" content="Обратный отсчёт до закрытой беты #2 (3 сент, 18:00 UTC) и раннего доступа (10 сент, 20:00 МСК)." />
 <!-- Open Graph (превью в Discord / Steam / соцсетях) -->
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://stormmagic1337.github.io/wardogs-timer/" />
-<meta property="og:title" content="До старта WARDOGS" />
-<meta property="og:description" content="Обратный отсчёт до раннего доступа — 20:00 МСК / 17:00 UTC, 10.09.2026." />
+<meta property="og:title" content="WARDOGS — таймеры беты и релиза" />
+<meta property="og:description" content="Закрытая бета #2 — 3 сент, 21:00 МСК / 18:00 UTC. Ранний доступ — 10 сент, 20:00 МСК / 17:00 UTC." />
 <meta property="og:image" content="https://stormmagic1337.github.io/wardogs-timer/og.png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta name="theme-color" content="#F2A900" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="До старта WARDOGS" />
+<meta name="twitter:title" content="WARDOGS — таймеры беты и релиза" />
 <meta name="twitter:image" content="https://stormmagic1337.github.io/wardogs-timer/og.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,7 +23,6 @@
 <style>
   :root{
     --bg:#14160F;
-    --panel:#1B1E15;
     --line:#3A3E30;
     --ink:#E8E4D5;
     --muted:#8C8D77;
@@ -43,289 +42,278 @@
     display:flex;
     flex-direction:column;
     align-items:center;
-    justify-content:center;
-    padding:28px 18px 40px;
+    justify-content:flex-start;
+    padding:34px 18px 44px;
     letter-spacing:.02em;
   }
 
-  /* hazard stripe */
   .hazard{
     position:fixed;top:0;left:0;right:0;height:8px;
     background:repeating-linear-gradient(135deg,var(--amber) 0 22px,#14160F 22px 44px);
-    opacity:.85;
+    opacity:.85;z-index:5;
   }
+
+  /* ---- блок таймера с локальной темой ---- */
+  .block{
+    width:min(720px,100%);
+    --accent:var(--amber);
+    --accent-dim:var(--amber-dim);
+    --accent-soft:#ffce4d;
+    --glow:rgba(242,169,0,.35);
+  }
+  .block.theme-blue{
+    --accent:#2BD9FF;
+    --accent-dim:#0f6f86;
+    --accent-soft:#a9f1ff;
+    --glow:rgba(43,217,255,.5);
+  }
+  .divider{
+    width:min(720px,100%);display:flex;align-items:center;gap:14px;margin:26px 0 10px;
+    color:var(--muted);font-family:'Oswald',sans-serif;font-size:11px;
+    letter-spacing:.34em;text-transform:uppercase;
+  }
+  .divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--line)}
 
   .eyebrow{
     font-size:clamp(11px,2.4vw,13px);
-    letter-spacing:.42em;
-    text-transform:uppercase;
-    color:var(--amber);
-    text-align:center;
-    margin-bottom:10px;
+    letter-spacing:.4em;text-transform:uppercase;
+    color:var(--accent);text-align:center;margin-bottom:8px;
   }
-  h1{
-    font-weight:700;
-    text-transform:uppercase;
-    font-size:clamp(26px,7vw,52px);
-    line-height:1;
-    text-align:center;
-    letter-spacing:.06em;
-    margin-bottom:26px;
+  .title{
+    font-weight:700;text-transform:uppercase;
+    font-size:clamp(22px,6vw,44px);line-height:1;
+    text-align:center;letter-spacing:.06em;margin-bottom:20px;
   }
 
-  /* briefing panel */
   .panel{
     position:relative;
-    width:min(720px,100%);
     background:linear-gradient(180deg,#1E2117,#171A11);
     border:1px solid var(--line);
-    padding:clamp(26px,5vw,44px) clamp(18px,4vw,40px);
+    padding:clamp(24px,5vw,40px) clamp(16px,4vw,38px);
   }
-  /* corner brackets */
-  .panel::before,.panel::after{
-    content:"";position:absolute;width:22px;height:22px;pointer-events:none;
-  }
-  .panel::before{top:-1px;left:-1px;border-top:2px solid var(--amber);border-left:2px solid var(--amber)}
-  .panel::after{bottom:-1px;right:-1px;border-bottom:2px solid var(--amber);border-right:2px solid var(--amber)}
+  .theme-blue .panel{background:linear-gradient(180deg,#141d21,#0f1418)}
+  .panel::before,.panel::after{content:"";position:absolute;width:22px;height:22px;pointer-events:none}
+  .panel::before{top:-1px;left:-1px;border-top:2px solid var(--accent);border-left:2px solid var(--accent)}
+  .panel::after{bottom:-1px;right:-1px;border-bottom:2px solid var(--accent);border-right:2px solid var(--accent)}
   .corner-tr,.corner-bl{position:absolute;width:22px;height:22px;pointer-events:none}
-  .corner-tr{top:-1px;right:-1px;border-top:2px solid var(--amber);border-right:2px solid var(--amber)}
-  .corner-bl{bottom:-1px;left:-1px;border-bottom:2px solid var(--amber);border-left:2px solid var(--amber)}
+  .corner-tr{top:-1px;right:-1px;border-top:2px solid var(--accent);border-right:2px solid var(--accent)}
+  .corner-bl{bottom:-1px;left:-1px;border-bottom:2px solid var(--accent);border-left:2px solid var(--accent)}
 
-  /* scanline shimmer over the clock */
   .clock-wrap{position:relative;overflow:hidden}
   .clock-wrap::after{
     content:"";position:absolute;inset:0;pointer-events:none;
-    background:linear-gradient(180deg,transparent 0%,rgba(242,169,0,.06) 50%,transparent 100%);
-    background-size:100% 6px;
-    mix-blend-mode:screen;
-    animation:scan 6s linear infinite;
+    background:linear-gradient(180deg,transparent 0%,rgba(255,255,255,.05) 50%,transparent 100%);
+    background-size:100% 6px;mix-blend-mode:screen;animation:scan 6s linear infinite;
   }
   @keyframes scan{from{background-position:0 -80px}to{background-position:0 80px}}
 
   .clock{
-    display:grid;
-    grid-template-columns:repeat(5,1fr);
-    align-items:end;
-    font-family:'Share Tech Mono',ui-monospace,monospace;
-    text-align:center;
-    gap:0;
-    opacity:0;
-    transition:opacity .35s ease;
+    display:grid;grid-template-columns:repeat(5,1fr);align-items:end;
+    font-family:'Share Tech Mono',ui-monospace,monospace;text-align:center;gap:0;
+    opacity:0;transition:opacity .35s ease;
   }
   .clock.ready{opacity:1}
-  .noscript-fallback{
-    text-align:center;color:var(--amber);
-    font-family:'Share Tech Mono',monospace;font-size:16px;padding:18px 0;
-  }
+  .noscript-fallback{text-align:center;color:var(--accent);font-family:'Share Tech Mono',monospace;font-size:16px;padding:18px 0}
   .unit{position:relative;padding:6px 0}
   .num{
-    font-size:clamp(26px,8vw,58px);
-    line-height:.95;
-    color:var(--amber);
-    text-shadow:0 0 18px rgba(242,169,0,.35);
-    font-variant-numeric:tabular-nums;
+    font-size:clamp(26px,8vw,58px);line-height:.95;color:var(--accent);
+    text-shadow:0 0 18px var(--glow);font-variant-numeric:tabular-nums;
   }
-  .unit.msu .num{color:#ffce4d}
+  .unit.msu .num{color:var(--accent-soft)}
   .lbl{
-    margin-top:10px;
-    font-family:'Oswald',sans-serif;
-    font-size:clamp(9px,2vw,12px);
-    letter-spacing:.28em;
-    text-transform:uppercase;
-    color:var(--muted);
+    margin-top:10px;font-family:'Oswald',sans-serif;font-size:clamp(9px,2vw,12px);
+    letter-spacing:.28em;text-transform:uppercase;color:var(--muted);
   }
-  /* colon separators */
   .unit + .unit::before{
-    content:":";
-    position:absolute;left:-.08em;top:clamp(4px,2.2vw,10px);
-    transform:translateX(-50%);
-    font-size:clamp(20px,5.5vw,42px);
-    color:var(--amber-dim);
+    content:":";position:absolute;left:-.08em;top:clamp(4px,2.2vw,10px);
+    transform:translateX(-50%);font-size:clamp(20px,5.5vw,42px);color:var(--accent-dim);
   }
 
   .muster{
-    margin-top:30px;
-    border-top:1px solid var(--line);
-    padding-top:18px;
-    display:flex;flex-wrap:wrap;gap:6px 20px;
-    justify-content:space-between;align-items:baseline;
-    font-family:'Share Tech Mono',monospace;
-    font-size:clamp(12px,2.6vw,15px);
-    color:var(--ink);
+    margin-top:28px;border-top:1px solid var(--line);padding-top:16px;
+    display:flex;flex-wrap:wrap;gap:6px 20px;justify-content:space-between;align-items:baseline;
+    font-family:'Share Tech Mono',monospace;font-size:clamp(12px,2.6vw,15px);color:var(--ink);
   }
   .muster .k{color:var(--muted);letter-spacing:.15em;text-transform:uppercase;font-family:'Oswald',sans-serif;font-size:11px}
-  .muster .v{color:var(--amber)}
+  .muster .v{color:var(--accent)}
 
-  .now{
-    margin-top:12px;
-    font-family:'Share Tech Mono',monospace;
-    font-size:clamp(11px,2.4vw,13px);
-    color:var(--muted);
-    text-align:center;
-  }
+  .now{margin-top:12px;font-family:'Share Tech Mono',monospace;font-size:clamp(11px,2.4vw,13px);color:var(--muted);text-align:center}
   .now b{color:var(--ink);font-weight:400}
 
-  /* live / go states */
+  .status-wrap{text-align:center}
   .status-tag{
-    display:inline-block;margin-top:22px;
-    font-size:12px;letter-spacing:.3em;text-transform:uppercase;
-    color:var(--amber);border:1px solid var(--amber-dim);padding:6px 14px;
+    display:inline-block;margin-top:20px;font-size:12px;letter-spacing:.3em;text-transform:uppercase;
+    color:var(--accent);border:1px solid var(--accent-dim);padding:6px 14px;
   }
-  body.go .num{color:var(--alert);text-shadow:0 0 22px rgba(210,65,39,.5)}
-  body.go .eyebrow{color:var(--alert)}
-  body.go .panel::before,body.go .panel::after,
-  body.go .corner-tr,body.go .corner-bl{border-color:var(--alert)}
-  body.go .hazard{background:repeating-linear-gradient(135deg,var(--alert) 0 22px,#14160F 22px 44px)}
 
-  /* нижний блок "всего" — часы и секунды */
-  .totals{
-    width:min(720px,100%);
-    margin-top:14px;
-    display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:12px;
-  }
-  .stat{
-    background:linear-gradient(180deg,#1E2117,#171A11);
-    border:1px solid var(--line);
-    padding:16px 8px;
-    text-align:center;
-    overflow:hidden;
-  }
+  /* go-state — событие началось */
+  .block.go .num{color:var(--alert);text-shadow:0 0 22px rgba(210,65,39,.5)}
+  .block.go .eyebrow{color:var(--alert)}
+  .block.go .panel::before,.block.go .panel::after,
+  .block.go .corner-tr,.block.go .corner-bl{border-color:var(--alert)}
+  .block.go .status-tag{color:var(--alert);border-color:var(--alert)}
+  .block.go .snum{color:var(--alert)}
+
+  .totals{margin-top:14px;display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  .stat{background:linear-gradient(180deg,#1E2117,#171A11);border:1px solid var(--line);padding:16px 8px;text-align:center;overflow:hidden}
+  .theme-blue .stat{background:linear-gradient(180deg,#141d21,#0f1418)}
   .stat .snum{
-    font-family:'Share Tech Mono',ui-monospace,monospace;
-    font-size:clamp(20px,5vw,34px);
-    color:var(--amber);
-    font-variant-numeric:tabular-nums;
-    line-height:1;
-    text-shadow:0 0 14px rgba(242,169,0,.3);
-    white-space:nowrap;
+    font-family:'Share Tech Mono',ui-monospace,monospace;font-size:clamp(20px,5vw,34px);color:var(--accent);
+    font-variant-numeric:tabular-nums;line-height:1;text-shadow:0 0 14px var(--glow);white-space:nowrap;
   }
-  .stat .slbl{
-    margin-top:9px;
-    font-family:'Oswald',sans-serif;
-    font-size:clamp(9px,2vw,11px);
-    letter-spacing:.2em;
-    text-transform:uppercase;
-    color:var(--muted);
-  }
-  body.go .stat .snum{color:var(--alert)}
+  .stat .slbl{margin-top:9px;font-family:'Oswald',sans-serif;font-size:clamp(9px,2vw,11px);letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
   @media (max-width:520px){ .totals{grid-template-columns:1fr} }
 
-  footer{
-    width:min(720px,100%);
-    margin-top:26px;
-    font-family:'Share Tech Mono',monospace;
-    font-size:12px;color:var(--muted);line-height:1.7;
-  }
+  footer{width:min(720px,100%);margin-top:26px;font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--muted);line-height:1.7}
   footer a{color:var(--amber);text-decoration:none;border-bottom:1px solid var(--amber-dim)}
   footer a:hover,footer a:focus{color:#ffce4d;border-bottom-color:#ffce4d}
   footer a:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
   footer .note{margin-top:10px;color:#6f7160}
 
-  @media (prefers-reduced-motion:reduce){
-    .clock-wrap::after{animation:none}
-  }
+  @media (prefers-reduced-motion:reduce){ .clock-wrap::after{animation:none} }
 </style>
 </head>
 <body>
   <div class="hazard" aria-hidden="true"></div>
 
-  <p class="eyebrow">Операция // Ранний доступ</p>
-  <h1>До старта WARDOGS</h1>
+  <!-- ===== ТАЙМЕР 1: ЗАКРЫТАЯ БЕТА #2 (синий неон) ===== -->
+  <section class="block theme-blue" id="blockBeta" aria-label="Обратный отсчёт до закрытой беты">
+    <p class="eyebrow">Операция // Внеплановый тест</p>
+    <h1 class="title">Закрытая бета #2</h1>
 
-  <section class="panel" aria-label="Обратный отсчёт до старта">
-    <span class="corner-tr" aria-hidden="true"></span>
-    <span class="corner-bl" aria-hidden="true"></span>
-
-    <div class="clock-wrap">
-      <div class="clock" role="timer" aria-live="polite">
-        <div class="unit"><div class="num" id="d">00</div><div class="lbl">дней</div></div>
-        <div class="unit"><div class="num" id="h">00</div><div class="lbl">часов</div></div>
-        <div class="unit"><div class="num" id="m">00</div><div class="lbl">минут</div></div>
-        <div class="unit"><div class="num" id="s">00</div><div class="lbl">секунд</div></div>
-        <div class="unit msu"><div class="num" id="ms">000</div><div class="lbl">мс</div></div>
+    <div class="panel">
+      <span class="corner-tr" aria-hidden="true"></span>
+      <span class="corner-bl" aria-hidden="true"></span>
+      <div class="clock-wrap">
+        <div class="clock" role="timer" aria-live="polite">
+          <div class="unit"><div class="num" id="bd">00</div><div class="lbl">дней</div></div>
+          <div class="unit"><div class="num" id="bh">00</div><div class="lbl">часов</div></div>
+          <div class="unit"><div class="num" id="bm">00</div><div class="lbl">минут</div></div>
+          <div class="unit"><div class="num" id="bs">00</div><div class="lbl">секунд</div></div>
+          <div class="unit msu"><div class="num" id="bms">000</div><div class="lbl">мс</div></div>
+        </div>
+        <noscript><p class="noscript-fallback">Закрытая бета #2: 03.09.2026 · 21:00 МСК (18:00 UTC)</p></noscript>
       </div>
-      <noscript>
-        <p class="noscript-fallback">Ранний доступ: 10.09.2026 · 20:00 МСК (17:00 UTC)</p>
-      </noscript>
+
+      <div class="muster">
+        <span><span class="k">Старт</span> &nbsp;<span class="v">03.09.2026 · 21:00 МСК</span></span>
+        <span><span class="k">UTC</span> &nbsp;<span class="v">18:00</span></span>
+      </div>
+      <p class="now">Сейчас по Москве: <b id="bNow">--:--:--</b></p>
+      <div class="status-wrap"><span class="status-tag" id="bStatus">до закрытой беты</span></div>
     </div>
 
-    <div class="muster">
-      <span><span class="k">Сбор</span> &nbsp;<span class="v" id="muster">10.09.2026 · 20:00 МСК</span></span>
-      <span><span class="k">UTC</span> &nbsp;<span class="v" id="musterUtc">17:00</span></span>
-    </div>
-    <p class="now">Сейчас по Москве: <b id="mskNow">--:--:--</b></p>
-
-    <div style="text-align:center">
-      <span class="status-tag" id="statusTag">до раннего доступа</span>
+    <div class="totals">
+      <div class="stat"><div class="snum" id="btH">0</div><div class="slbl">часов всего</div></div>
+      <div class="stat"><div class="snum" id="btS">0</div><div class="slbl">секунд всего</div></div>
     </div>
   </section>
 
-  <section class="totals" aria-label="Всего до старта">
-    <div class="stat"><div class="snum" id="tHours">0</div><div class="slbl">часов всего</div></div>
-    <div class="stat"><div class="snum" id="tSecs">0</div><div class="slbl">секунд всего</div></div>
+  <div class="divider">затем — ранний доступ</div>
+
+  <!-- ===== ТАЙМЕР 2: РАННИЙ ДОСТУП (янтарный) ===== -->
+  <section class="block" id="blockRelease" aria-label="Обратный отсчёт до раннего доступа">
+    <p class="eyebrow">Операция // Ранний доступ</p>
+    <h2 class="title">До раннего доступа</h2>
+
+    <div class="panel">
+      <span class="corner-tr" aria-hidden="true"></span>
+      <span class="corner-bl" aria-hidden="true"></span>
+      <div class="clock-wrap">
+        <div class="clock" role="timer" aria-live="polite">
+          <div class="unit"><div class="num" id="d">00</div><div class="lbl">дней</div></div>
+          <div class="unit"><div class="num" id="h">00</div><div class="lbl">часов</div></div>
+          <div class="unit"><div class="num" id="m">00</div><div class="lbl">минут</div></div>
+          <div class="unit"><div class="num" id="s">00</div><div class="lbl">секунд</div></div>
+          <div class="unit msu"><div class="num" id="ms">000</div><div class="lbl">мс</div></div>
+        </div>
+        <noscript><p class="noscript-fallback">Ранний доступ: 10.09.2026 · 20:00 МСК (17:00 UTC)</p></noscript>
+      </div>
+
+      <div class="muster">
+        <span><span class="k">Сбор</span> &nbsp;<span class="v">10.09.2026 · 20:00 МСК</span></span>
+        <span><span class="k">UTC</span> &nbsp;<span class="v">17:00</span></span>
+      </div>
+      <p class="now">Сейчас по Москве: <b id="mskNow">--:--:--</b></p>
+      <div class="status-wrap"><span class="status-tag" id="statusTag">до раннего доступа</span></div>
+    </div>
+
+    <div class="totals">
+      <div class="stat"><div class="snum" id="tHours">0</div><div class="slbl">часов всего</div></div>
+      <div class="stat"><div class="snum" id="tSecs">0</div><div class="slbl">секунд всего</div></div>
+    </div>
   </section>
 
   <footer>
-    17:00 UTC = 20:00 по Москве. Россия не переходит на летнее время — смещение постоянно.<br>
+    Часовые пояса: 18:00 UTC = 21:00 МСК · 17:00 UTC = 20:00 МСК. Россия не переходит на летнее время.<br>
     Discord СНГ: <a href="https://discord.com/invite/kwxrTCJxre" target="_blank" rel="noopener">discord.gg/kwxrTCJxre</a>
     &nbsp;·&nbsp; Калькулятор: <a href="https://djzet.github.io/wardogs-calc/" target="_blank" rel="noopener">wardogs-calc</a>
-    <p class="note">Время раннего доступа — по данным сообщества, может измениться. Сверяйтесь с официальным Discord / @WARDOGS.</p>
+    <p class="note">Даты и время — по данным сообщества, могут измениться. Сверяйтесь с официальным Discord / @WARDOGS.</p>
   </footer>
 
 <script>
   /* ============================================================
-     НАСТРОЙКА: старт раннего доступа как момент времени в UTC.
-     20:00 МСК = 17:00 UTC. Формат: Date.UTC(год, месяц-1, день, час, мин, сек)
-     Месяц считается с нуля: август = 7.
-     Чтобы поменять на будущий тест — правьте только эту строку.
+     НАСТРОЙКА: моменты старта в UTC. Месяц с нуля (сентябрь = 8).
+       Закрытая бета #2 : 03.09.2026 18:00 UTC = 21:00 МСК
+       Ранний доступ    : 10.09.2026 17:00 UTC = 20:00 МСК
+     Чтобы сдвинуть событие — правьте нужный Date.UTC(...).
      ============================================================ */
-  const START_UTC = Date.UTC(2026, 8, 10, 17, 0, 0);   // 10.09.2026 17:00 UTC = 20:00 МСК (ранний доступ)
+  const BETA_UTC    = Date.UTC(2026, 8, 3, 18, 0, 0);
+  const RELEASE_UTC = Date.UTC(2026, 8, 10, 17, 0, 0);
 
-  const pad = n => String(n).padStart(2, '0');
+  const pad  = n => String(n).padStart(2, '0');
   const pad3 = n => String(n).padStart(3, '0');
-  const el = id => document.getElementById(id);
+  const el   = id => document.getElementById(id);
+  const fmt  = n => n.toLocaleString('ru-RU');
 
-  // пишем в DOM только при изменении значения:
-  // мс меняются каждый кадр, остальные разряды — раз в секунду
   const cache = {};
   const set = (id, val) => { if (cache[id] !== val) { cache[id] = val; el(id).textContent = val; } };
-  const fmt = n => n.toLocaleString('ru-RU'); // разрядные пробелы: 1 764 900
 
   function mskClock(now){
-    // текущее время по Москве (UTC+3) независимо от часового пояса зрителя
-    const msk = new Date(now + 3*3600*1000);
+    const msk = new Date(now + 3*3600*1000); // МСК = UTC+3
     return pad(msk.getUTCHours())+':'+pad(msk.getUTCMinutes())+':'+pad(msk.getUTCSeconds());
+  }
+
+  const TIMERS = [
+    { start:BETA_UTC, block:el('blockBeta'),
+      d:'bd', h:'bh', m:'bm', s:'bs', ms:'bms', tH:'btH', tS:'btS', now:'bNow', status:'bStatus',
+      waiting:'до закрытой беты', live:'● бета идёт — в бой' },
+    { start:RELEASE_UTC, block:el('blockRelease'),
+      d:'d', h:'h', m:'m', s:'s', ms:'ms', tH:'tHours', tS:'tSecs', now:'mskNow', status:'statusTag',
+      waiting:'до раннего доступа', live:'● ранний доступ открыт — вперёд' },
+  ];
+
+  function tick(c, now, msk){
+    set(c.now, msk);
+    const diff = c.start - now;
+    if (diff > 0){
+      set(c.d,  pad(Math.floor(diff/86400000)));
+      set(c.h,  pad(Math.floor(diff%86400000/3600000)));
+      set(c.m,  pad(Math.floor(diff%3600000/60000)));
+      set(c.s,  pad(Math.floor(diff%60000/1000)));
+      set(c.ms, pad3(Math.floor(diff%1000)));
+      set(c.tH, fmt(Math.floor(diff/3600000)));
+      set(c.tS, fmt(Math.floor(diff/1000)));
+      c.block.classList.remove('go');
+      set(c.status, c.waiting);
+    } else {
+      set(c.d,'00'); set(c.h,'00'); set(c.m,'00'); set(c.s,'00'); set(c.ms,'000');
+      set(c.tH,'0'); set(c.tS,'0');
+      c.block.classList.add('go');
+      set(c.status, c.live);
+    }
   }
 
   function frame(){
     const now = Date.now();
-    set('mskNow', mskClock(now));
-
-    const diff = START_UTC - now;
-
-    if (diff > 0){
-      set('d',  pad(Math.floor(diff/86400000)));
-      set('h',  pad(Math.floor(diff%86400000/3600000)));
-      set('m',  pad(Math.floor(diff%3600000/60000)));
-      set('s',  pad(Math.floor(diff%60000/1000)));
-      set('ms', pad3(Math.floor(diff%1000)));
-      set('tHours', fmt(Math.floor(diff/3600000)));
-      set('tSecs',  fmt(Math.floor(diff/1000)));
-      document.body.classList.remove('go');
-      set('statusTag', 'до раннего доступа');
-    } else {
-      set('d','00'); set('h','00'); set('m','00'); set('s','00'); set('ms','000');
-      set('tHours', '0'); set('tSecs', '0');
-      document.body.classList.add('go');
-      set('statusTag', '● ранний доступ открыт — вперёд');
-    }
+    const msk = mskClock(now);
+    for (const c of TIMERS) tick(c, now, msk);
     requestAnimationFrame(frame);
   }
 
   frame();
-  document.querySelector('.clock').classList.add('ready'); // показать только после расчёта
+  document.querySelectorAll('.clock').forEach(c => c.classList.add('ready'));
+  requestAnimationFrame(frame);
 </script>
 </body>
 </html>

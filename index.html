@@ -4,12 +4,12 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>WARDOGS — таймеры беты и релиза</title>
-<meta name="description" content="Обратный отсчёт до закрытой беты #2 (3 сент, 18:00 UTC) и раннего доступа (10 сент, 20:00 МСК)." />
+<meta name="description" content="Отсчёт до закрытой беты #2 (старт 3 сент 22:00 МСК / 19:00 UTC, окно до 6 сент) и раннего доступа (10 сент 20:00 МСК)." />
 <!-- Open Graph (превью в Discord / Steam / соцсетях) -->
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://stormmagic1337.github.io/wardogs-timer/" />
 <meta property="og:title" content="WARDOGS — таймеры беты и релиза" />
-<meta property="og:description" content="Закрытая бета #2 — 3 сент, 21:00 МСК / 18:00 UTC. Ранний доступ — 10 сент, 20:00 МСК / 17:00 UTC." />
+<meta property="og:description" content="Закрытая бета #2 — 3–6 сент (старт 22:00 МСК / 19:00 UTC). Ранний доступ — 10 сент, 20:00 МСК / 17:00 UTC." />
 <meta property="og:image" content="https://stormmagic1337.github.io/wardogs-timer/og.png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
@@ -154,6 +154,11 @@
   .block.go .status-tag{color:var(--alert);border-color:var(--alert)}
   .block.go .snum{color:var(--alert)}
 
+  /* live-state — событие идёт (серверы онлайн) */
+  @keyframes livepulse{0%,100%{opacity:1}50%{opacity:.4}}
+  .block.live .status-tag{color:#36f39a;border-color:#1f7a45;animation:livepulse 1.3s ease-in-out infinite}
+  @media (prefers-reduced-motion:reduce){ .block.live .status-tag{animation:none} }
+
   .totals{margin-top:14px;display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
   .stat{background:linear-gradient(180deg,#1E2117,#171A11);border:1px solid var(--line);padding:16px 8px;text-align:center;overflow:hidden}
   .theme-blue .stat{background:linear-gradient(180deg,#141d21,#0f1418)}
@@ -192,12 +197,12 @@
           <div class="unit"><div class="num" id="bs">00</div><div class="lbl">секунд</div></div>
           <div class="unit msu"><div class="num" id="bms">000</div><div class="lbl">мс</div></div>
         </div>
-        <noscript><p class="noscript-fallback">Закрытая бета #2: 03.09.2026 · 21:00 МСК (18:00 UTC)</p></noscript>
+        <noscript><p class="noscript-fallback">Закрытая бета #2: 03.09 22:00 МСК — 06.09 11:00 МСК (19:00–08:00 UTC)</p></noscript>
       </div>
 
       <div class="muster">
-        <span><span class="k">Старт</span> &nbsp;<span class="v">03.09.2026 · 21:00 МСК</span></span>
-        <span><span class="k">UTC</span> &nbsp;<span class="v">18:00</span></span>
+        <span><span class="k">Старт</span> &nbsp;<span class="v">03.09 · 22:00 МСК</span> <span class="k">/ 19:00 UTC</span></span>
+        <span><span class="k">Конец</span> &nbsp;<span class="v">06.09 · 11:00 МСК</span> <span class="k">/ 08:00 UTC</span></span>
       </div>
       <p class="now">Сейчас по Москве: <b id="bNow">--:--:--</b></p>
       <div class="status-wrap"><span class="status-tag" id="bStatus">до закрытой беты</span></div>
@@ -253,13 +258,15 @@
 
 <script>
   /* ============================================================
-     НАСТРОЙКА: моменты старта в UTC. Месяц с нуля (сентябрь = 8).
-       Закрытая бета #2 : 03.09.2026 18:00 UTC = 21:00 МСК
-       Ранний доступ    : 10.09.2026 17:00 UTC = 20:00 МСК
-     Чтобы сдвинуть событие — правьте нужный Date.UTC(...).
+     НАСТРОЙКА: моменты в UTC. Месяц с нуля (сентябрь = 8).
+       Закрытая бета #2 : старт 03.09 19:00 UTC = 22:00 МСК
+                          конец 06.09 08:00 UTC = 11:00 МСК
+       Ранний доступ    : 10.09 17:00 UTC = 20:00 МСК
+     Правьте нужный Date.UTC(...), чтобы сдвинуть событие/окно.
      ============================================================ */
-  const BETA_UTC    = Date.UTC(2026, 8, 3, 18, 0, 0);
-  const RELEASE_UTC = Date.UTC(2026, 8, 10, 17, 0, 0);
+  const BETA_UTC     = Date.UTC(2026, 8, 3, 19, 0, 0);
+  const BETA_END_UTC = Date.UTC(2026, 8, 6, 8, 0, 0);
+  const RELEASE_UTC  = Date.UTC(2026, 8, 10, 17, 0, 0);
 
   const pad  = n => String(n).padStart(2, '0');
   const pad3 = n => String(n).padStart(3, '0');
@@ -275,32 +282,57 @@
   }
 
   const TIMERS = [
-    { start:BETA_UTC, block:el('blockBeta'),
+    { start:BETA_UTC, end:BETA_END_UTC, block:el('blockBeta'),
       d:'bd', h:'bh', m:'bm', s:'bs', ms:'bms', tH:'btH', tS:'btS', now:'bNow', status:'bStatus',
-      waiting:'до закрытой беты', live:'● бета идёт — в бой' },
-    { start:RELEASE_UTC, block:el('blockRelease'),
+      before:'до старта беты', live:'● серверы онлайн · до конца', after:'окно закрыто — серверы офлайн' },
+    { start:RELEASE_UTC, end:null, block:el('blockRelease'),
       d:'d', h:'h', m:'m', s:'s', ms:'ms', tH:'tHours', tS:'tSecs', now:'mskNow', status:'statusTag',
-      waiting:'до раннего доступа', live:'● ранний доступ открыт — вперёд' },
+      before:'до раннего доступа', live:'● ранний доступ открыт — вперёд' },
   ];
+
+  function countdown(c, diff){
+    set(c.d,  pad(Math.floor(diff/86400000)));
+    set(c.h,  pad(Math.floor(diff%86400000/3600000)));
+    set(c.m,  pad(Math.floor(diff%3600000/60000)));
+    set(c.s,  pad(Math.floor(diff%60000/1000)));
+    set(c.ms, pad3(Math.floor(diff%1000)));
+    set(c.tH, fmt(Math.floor(diff/3600000)));
+    set(c.tS, fmt(Math.floor(diff/1000)));
+  }
+  function zeros(c){
+    set(c.d,'00'); set(c.h,'00'); set(c.m,'00'); set(c.s,'00'); set(c.ms,'000');
+    set(c.tH,'0'); set(c.tS,'0');
+  }
 
   function tick(c, now, msk){
     set(c.now, msk);
-    const diff = c.start - now;
-    if (diff > 0){
-      set(c.d,  pad(Math.floor(diff/86400000)));
-      set(c.h,  pad(Math.floor(diff%86400000/3600000)));
-      set(c.m,  pad(Math.floor(diff%3600000/60000)));
-      set(c.s,  pad(Math.floor(diff%60000/1000)));
-      set(c.ms, pad3(Math.floor(diff%1000)));
-      set(c.tH, fmt(Math.floor(diff/3600000)));
-      set(c.tS, fmt(Math.floor(diff/1000)));
-      c.block.classList.remove('go');
-      set(c.status, c.waiting);
+    if (c.end != null){
+      if (now < c.start){                       // фаза 1: до старта
+        countdown(c, c.start - now);
+        c.block.classList.remove('go','live');
+        set(c.status, c.before);
+      } else if (now < c.end){                  // фаза 2: идёт → до конца окна
+        countdown(c, c.end - now);
+        c.block.classList.add('live');
+        c.block.classList.remove('go');
+        set(c.status, c.live);
+      } else {                                  // фаза 3: окно закрыто
+        zeros(c);
+        c.block.classList.remove('live');
+        c.block.classList.add('go');
+        set(c.status, c.after);
+      }
     } else {
-      set(c.d,'00'); set(c.h,'00'); set(c.m,'00'); set(c.s,'00'); set(c.ms,'000');
-      set(c.tH,'0'); set(c.tS,'0');
-      c.block.classList.add('go');
-      set(c.status, c.live);
+      const diff = c.start - now;
+      if (diff > 0){
+        countdown(c, diff);
+        c.block.classList.remove('go','live');
+        set(c.status, c.before);
+      } else {
+        zeros(c);
+        c.block.classList.add('go');
+        set(c.status, c.live);
+      }
     }
   }
 
